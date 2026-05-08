@@ -42,6 +42,7 @@ swap of RGB565 color on the LVGL configuration menuconfig (it's not handled auto
 - FT6206 controllers should work as well (not tested)
 - STMPE610
 - FT81x (Single, Dual, and Quad SPI)
+- TSC2007 (I2C)
 
 If your display or input device (touch) controller is not supported consider contributing to this repo by
 adding support to it! [Contribute controller support](CONTRIBUTE_CONTROLLER_SUPPORT.md)
