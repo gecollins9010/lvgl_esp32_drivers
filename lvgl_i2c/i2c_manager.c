@@ -26,6 +26,10 @@ SOFTWARE.
 
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 
@@ -34,9 +38,12 @@ SOFTWARE.
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
-#include <driver/i2c.h>
+//#include "driver/i2c.h"
+//#include <driver/i2c_master.h>
+//#include <driver/i2c_types.h>
+#include "i2c_manager.h"
 
-#include "sdkconfig.h"
+//#include "sdkconfig.h"
 
 #include "i2c_manager.h"
 
@@ -58,7 +65,7 @@ static SemaphoreHandle_t* I2C_FN(_mutex) = &I2C_FN(_local_mutex)[0];
 
 static const uint8_t ACK_CHECK_EN = 1;
 
-#if defined (I2C_NUM_0) && defined (CONFIG_I2C_MANAGER_0_ENABLED)
+#if defined (CONFIG_I2C_MANAGER_0_ENABLED)
 	#define I2C_ZERO 					I2C_NUM_0
 	#if defined (CONFIG_I2C_MANAGER_0_PULLUPS)
 		#define I2C_MANAGER_0_PULLUPS 	true
@@ -66,12 +73,12 @@ static const uint8_t ACK_CHECK_EN = 1;
 		#define I2C_MANAGER_0_PULLUPS 	false
 	#endif
 
-	#define I2C_MANAGER_0_TIMEOUT 		( CONFIG_I2C_MANAGER_0_TIMEOUT / portTICK_RATE_MS )
-	#define I2C_MANAGER_0_LOCK_TIMEOUT	( CONFIG_I2C_MANAGER_0_LOCK_TIMEOUT / portTICK_RATE_MS )
+	#define I2C_MANAGER_0_TIMEOUT 		( CONFIG_I2C_MANAGER_0_TIMEOUT / portTICK_PERIOD_MS )
+	#define I2C_MANAGER_0_LOCK_TIMEOUT	( CONFIG_I2C_MANAGER_0_LOCK_TIMEOUT / portTICK_PERIOD_MS )
 #endif
 
 
-#if defined (I2C_NUM_1) && defined (CONFIG_I2C_MANAGER_1_ENABLED)
+#if defined (CONFIG_I2C_MANAGER_1_ENABLED)
 	#define I2C_ONE 					I2C_NUM_1
 	#if defined (CONFIG_I2C_MANAGER_1_PULLUPS)
 		#define I2C_MANAGER_1_PULLUPS 	true
@@ -79,8 +86,8 @@ static const uint8_t ACK_CHECK_EN = 1;
 		#define I2C_MANAGER_1_PULLUPS 	false
 	#endif
 
-	#define I2C_MANAGER_1_TIMEOUT 		( CONFIG_I2C_MANAGER_1_TIMEOUT / portTICK_RATE_MS )
-	#define I2C_MANAGER_1_LOCK_TIMEOUT	( CONFIG_I2C_MANAGER_1_LOCK_TIMEOUT / portTICK_RATE_MS )
+	#define I2C_MANAGER_1_TIMEOUT 		( CONFIG_I2C_MANAGER_1_TIMEOUT / portTICK_PERIOD_MS )
+	#define I2C_MANAGER_1_LOCK_TIMEOUT	( CONFIG_I2C_MANAGER_1_LOCK_TIMEOUT / portTICK_PERIOD_MS )
 #endif
 
 #define ERROR_PORT(port, fail) { \
@@ -244,12 +251,12 @@ esp_err_t I2C_FN(_write)(i2c_port_t port, uint16_t addr, uint32_t reg, const uin
 	TickType_t timeout = 0;
 	#if defined (I2C_ZERO)
 		if (port == I2C_NUM_0) {
-			timeout = (CONFIG_I2C_MANAGER_0_TIMEOUT) / portTICK_RATE_MS;
+			timeout = (CONFIG_I2C_MANAGER_0_TIMEOUT) / portTICK_PERIOD_MS;
 		}
 	#endif
 	#if defined (I2C_ONE)
 		if (port == I2C_NUM_1) {
-			timeout = (CONFIG_I2C_MANAGER_1_TIMEOUT) / portTICK_RATE_MS;
+			timeout = (CONFIG_I2C_MANAGER_1_TIMEOUT) / portTICK_PERIOD_MS;
 		}
 	#endif
 
@@ -294,12 +301,12 @@ esp_err_t I2C_FN(_lock)(i2c_port_t port) {
 	TickType_t timeout;
 	#if defined (I2C_ZERO)
 		if (port == I2C_NUM_0) {
-			timeout = (CONFIG_I2C_MANAGER_0_LOCK_TIMEOUT) / portTICK_RATE_MS;
+			timeout = (CONFIG_I2C_MANAGER_0_LOCK_TIMEOUT) / portTICK_PERIOD_MS;
 		}
 	#endif
 	#if defined (I2C_ONE)
 		if (port == I2C_NUM_1) {
-			timeout = (CONFIG_I2C_MANAGER_1_LOCK_TIMEOUT) / portTICK_RATE_MS;
+			timeout = (CONFIG_I2C_MANAGER_1_LOCK_TIMEOUT) / portTICK_PERIOD_MS;
 		}
 	#endif
 
@@ -365,4 +372,7 @@ esp_err_t I2C_FN(_force_unlock)(i2c_port_t port) {
         return (void*)&_i2c_hal[port];
     }
 
+#endif
+#ifdef __cplusplus
+}
 #endif

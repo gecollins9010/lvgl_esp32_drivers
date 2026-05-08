@@ -10,6 +10,7 @@ menu "LVGL Touch controller"
         default 5 if LV_TOUCH_CONTROLLER_FT81X
         default 6 if LV_TOUCH_CONTROLLER_RA8875
         default 7 if LV_TOUCH_CONTROLLER_GT911
+        default 8 if LV_TOUCH_CONTROLLER_TSC2007
 
     choice
         prompt "Select a touch panel controller model."
@@ -40,6 +41,9 @@ menu "LVGL Touch controller"
         config LV_TOUCH_CONTROLLER_GT911
             select LV_I2C_TOUCH
             bool "GT911"
+        config LV_TOUCH_CONTROLLER_TSC2007
+            select LV_I2C_TOUCH
+            bool "TSC2007"
     endchoice
 
     config LV_TOUCH_DRIVER_PROTOCOL_SPI
@@ -458,6 +462,81 @@ menu "LVGL Touch controller"
             bool
             prompt "Invert Y coordinate value."
             default y
+
+    endmenu
+
+    menu "Touchpanel Configuration (TSC2007)"
+        depends on LV_TOUCH_CONTROLLER_TSC2007
+
+        config LV_TSC2007_TOUCH_X_MIN
+            int
+            prompt "Minimum X coordinate value."
+            default 300
+
+        config LV_TSC2007_TOUCH_Y_MIN
+            int
+            prompt "Minimum Y coordinate value."
+            default 185
+
+        config LV_TSC2007_TOUCH_X_MAX
+            int
+            prompt "Maximum X coordinate value."
+            default 3800
+
+        config LV_TSC2007_TOUCH_Y_MAX
+            int
+            prompt "Maximum Y coordinate value."
+            default 3700
+
+        config LV_TSC2007_TOUCH_THRESHOLD
+            int
+            prompt "Touch Pressure Threshold."
+            range 10 600
+            default 10
+            
+        config LV_TSC2007_TOUCH_XY_SWAP
+            bool
+            prompt "Swap XY."
+            default y
+
+        config LV_TSC2007_TOUCH_INVERT_X
+            bool
+            prompt "Invert X coordinate value."
+            default y
+
+        config LV_TSC2007_TOUCH_INVERT_Y
+            bool
+            prompt "Invert Y coordinate value."
+            default n
+        
+        config LV_TSC2007_TOUCH_LOG
+            bool
+            prompt "Log touch coordinates."
+            default n
+            help
+            Logs touch press coordinates and the min and max x and y values for all touches.
+            Requires ESP LOG_MAXIMUM_LEVEL to be DEBUG.
+
+        choice
+            prompt "Select touch detection method."
+            default LV_TSC2007_TOUCH_DETECT_PRESSURE
+            help
+                Select the controller for your touch panel.
+
+            config LV_TSC2007_TOUCH_DETECT_IRQ
+                bool "IRQ pin only"
+            config LV_TSC2007_TOUCH_DETECT_IRQ_PRESSURE
+                bool "IRQ pin and pressure"
+            config LV_TSC2007_TOUCH_DETECT_PRESSURE
+                bool "Pressure only"
+        endchoice
+
+        config LV_TSC2007_TOUCH_PIN_IRQ
+            int "GPIO for IRQ (Interrupt Request)"
+
+            default 25
+            help
+            Configure the touchpanel IRQ pin here.
 
     endmenu
 

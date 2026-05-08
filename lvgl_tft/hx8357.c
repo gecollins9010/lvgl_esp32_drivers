@@ -160,11 +160,11 @@ static uint8_t displayType = HX8357D;
 void hx8357_init(void)
 {
 	//Initialize non-SPI GPIOs
-    gpio_pad_select_gpio(HX8357_DC);
-	gpio_set_direction(HX8357_DC, GPIO_MODE_OUTPUT);
+  esp_rom_gpio_pad_select_gpio(HX8357_DC);
+  gpio_set_direction(HX8357_DC, GPIO_MODE_OUTPUT);
 
 #if HX8357_USE_RST
-    gpio_pad_select_gpio(HX8357_RST);
+  esp_rom_gpio_pad_select_gpio(HX8357_RST);
 	gpio_set_direction(HX8357_RST, GPIO_MODE_OUTPUT);
 
 	//Reset the display
@@ -192,11 +192,11 @@ void hx8357_init(void)
 			}
 		}
 		if (x & 0x80) {       // If high bit set...
-			vTaskDelay(numArgs * 5 / portTICK_RATE_MS); // numArgs is actually a delay time (5ms units)
+			vTaskDelay(numArgs * 5 / portTICK_PERIOD_MS); // numArgs is actually a delay time (5ms units)
 		}
 	}
 
-	hx8357_set_rotation(1);
+	hx8357_set_rotation(CONFIG_LV_DISPLAY_ORIENTATION);
 
 #if HX8357_INVERT_COLORS
 	hx8357_send_cmd(HX8357_INVON);
